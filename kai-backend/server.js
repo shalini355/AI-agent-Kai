@@ -5,6 +5,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai"; // Google Gemini SDK
 
 dotenv.config();
 
+const path = require("path");
+
 const app = express();
 const PORT = 5000;
 
@@ -59,6 +61,12 @@ app.post("/ai-mood", async (req, res) => {
       reply: "Sorry, I couldn't process your request. Please try again later.",
     });
   }
+});
+
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 app.listen(PORT, () => {
