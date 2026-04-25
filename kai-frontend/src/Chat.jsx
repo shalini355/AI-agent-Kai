@@ -29,7 +29,7 @@ function Chat({ onBack }) {
     setTyping(true);
 
     try {
-     fetch("https://your-backend-name.onrender.com/ai-mood", {
+     fetch("https://kai-backend.onrender.com/ai-mood", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
