@@ -1,80 +1,56 @@
-# Kai - AI Agent
+# Kai — Empathetic AI Wellness Agent
 
-**Kai** is an empathetic AI assistant designed to support mental wellness, track mood, and provide helpful resources in a friendly and confidential way. The project is built using **React** for the frontend and **Node.js + Express** for the backend.
+> Your AI best friend for mood tracking and mental wellness support.
 
----
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=flat&logo=express&logoColor=white)
+
+## What is Kai?
+
+Kai is a full-stack AI conversational assistant built for mood tracking and emotional wellness support. Unlike generic chatbots, Kai understands context and responds in both English and Hinglish — making it more natural and accessible for Indian users.
 
 ## Features
 
-1. **Empathetic AI Chat**  
-   - Friendly, confidential conversations with the AI.  
-   - Supports English and Hinglish for a youth-friendly tone.
-
-2. **Mood Check-In**  
-   - Daily tracking with emojis.  
-   - Simple sentiment analysis to detect user mood.
-
-3. **Guided Wellness Activities**  
-   - Journaling prompts, breathing exercises, and affirmations.
-
-4. **Resource Navigator**  
-   - Quick access to helplines and professional counselors.
-
-5. **Cultural Sensitivity**  
-   - AI understands both English and Hinglish inputs.
-
----
+- Real-time AI chat powered by Generative AI API
+- Multilingual support — English & Hinglish conversations
+- Mood tracking with contextual memory
+- Clean, responsive React frontend
+- Scalable REST backend built with Node.js & Express
 
 ## Tech Stack
 
-- **Frontend:** React, JavaScript, CSS  
-- **Backend:** Node.js, Express  
-- **AI Integration:** OpenAI API (or any generative AI model)  
-- **Other Tools:** Axios, Body-Parser, CORS, Dotenv
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React.js, CSS3 |
+| Backend | Node.js, Express.js |
+| AI | Generative AI API |
+| API | REST |
 
----
+## Getting Started
 
-## Setup Instructions
+### Prerequisites
+- Node.js v18+
+- npm or yarn
+- Generative AI API key
 
-### 1. Clone the Repository
+### Installation
+
 ```bash
-git clone https://github.com/shalini355/AI-agent-Kai-Prototype.git
-cd AI-agent-Kai-Prototype
+# Clone the repository
+git clone https://github.com/shalini355/AI-agent-Kai.git
+cd AI-agent-Kai
 
-2. Backend Setup
-cd kai-backend
+# Install backend dependencies
+cd backend
 npm install
-cp .env.example .env
-# Add your API keys and any required environment variables in .env
-node server.js
-Backend runs on http://localhost:5000 by default.
 
-3. Frontend Setup
-cd kai-frontend
+# Install frontend dependencies
+cd ../frontend
 npm install
-npm start
-Frontend runs on http://localhost:3000 by default.
-
-4. Using the App
-Open your browser at http://localhost:3000.
-
-Use the chat to talk with Kai.
-
-Check your mood using the Mood Check-In feature.
-
-Explore guided wellness activities and resources.
 ```
-Important Notes
-Add your Gemini API key in .env in the backend folder.
 
-Make sure to run the backend before starting the frontend.
+### Environment Variables
 
-Ignore node_modules in GitHub; .gitignore is provided.
-
-Contributing
-Fork the repo and create a new branch for your feature or bug fix.
-
-Submit a pull request with clear description of your changes.
-
-License
-This project is open-source and free to use under the MIT License.
+Create a `.env` file in the backend folder:
