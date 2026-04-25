@@ -29,7 +29,7 @@ function Chat({ onBack }) {
     setTyping(true);
 
     try {
-      const response = await fetch("http://localhost:5000/ai-mood", {
+     fetch("https://your-backend-name.onrender.com/ai-mood", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
