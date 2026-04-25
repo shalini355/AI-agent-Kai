@@ -17,10 +17,14 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Gemini client
+// const googleApiKey = process.env.GOOGLE_API_KEY;
+// if (!googleApiKey) {
+//   console.error("❌ GOOGLE_API_KEY not found");
+//   process.exit(1);
+// }
 const googleApiKey = process.env.GOOGLE_API_KEY;
 if (!googleApiKey) {
-  console.error("❌ GOOGLE_API_KEY not found");
-  process.exit(1);
+  console.warn("⚠️ GOOGLE_API_KEY not found, using fallback responses");
 }
 
 const genAI = new GoogleGenerativeAI(googleApiKey);
