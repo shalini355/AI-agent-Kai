@@ -9,7 +9,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "body-parser": "^2.2.0",
