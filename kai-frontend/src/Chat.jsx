@@ -29,7 +29,7 @@ function Chat({ onBack }) {
     setTyping(true);
 
     try {
-     fetch("https://kai-backend.onrender.com/ai-mood", {
+     fetch(`${process.env.REACT_APP_API_URL}/ai-mood`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
