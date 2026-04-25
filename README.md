@@ -54,3 +54,36 @@ npm install
 ### Environment Variables
 
 Create a `.env` file in the backend folder:
+
+GEMINI_API_KEY=your_api_key_here
+PORT=5000
+
+### Run the app
+
+```bash
+# Start backend
+cd backend && npm start
+
+# Start frontend (new terminal)
+cd frontend && npm start
+```
+
+App runs at `http://localhost:3000`
+
+## Project Structure
+AI-agent-Kai/
+├── frontend/          # React app
+│   ├── src/
+│   └── public/
+├── backend/           # Node.js + Express server
+│   ├── routes/
+│   └── index.js
+└── README.md
+
+## Why I built this
+
+Mental wellness tools are often too clinical or expensive. Kai is an attempt to make emotional support more accessible, conversational, and culturally aware for everyday users.
+
+## Connect
+
+**Shalini Yadav** — [LinkedIn](https://linkedin.com/in/shaliniyadav-355abc) · [GitHub](https://github.com/shalini355)
