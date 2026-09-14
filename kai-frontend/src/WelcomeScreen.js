@@ -341,12 +341,12 @@ function WelcomeScreen({ onNext, onContact, onAbout }) {
       {/* HERO */}
       <div style={styles.heroWrap}>
         <h1 style={styles.h1}>
-          Innovative AI Mental
+          A ready-to-use AI
           <br />
-          Health Chat Platform
+          wellness companion
         </h1>
         <div style={styles.sub}>
-          Track your mood, journal your thoughts, and find mental health resources with our AI chat platform.
+          Track your mood, reflect with intention, and access practical wellness support through a calm and trusted AI experience.
         </div>
 
         <div style={styles.ctaRow}>
@@ -501,7 +501,7 @@ function WelcomeScreen({ onNext, onContact, onAbout }) {
           <div style={styles.panel}>
             <h2 style={styles.panelH2}>Enhance Your Mental Well‑being with KAI</h2>
             <p style={styles.quote}>
-              “KAI AI Mental is a game‑changer in mental health support. The platform is intuitive, and the resources are incredibly helpful.” – Emma Hernandez
+              “The experience feels calm, supportive, and genuinely useful from the very first check-in.”
             </p>
             <button
               style={styles.panelBtn}

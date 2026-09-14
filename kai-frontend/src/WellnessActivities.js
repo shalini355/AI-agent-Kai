@@ -43,6 +43,19 @@ function WellnessActivities({ setScreen }) {
       justifyContent: "space-between",
       gap: 12,
       marginBottom: 12,
+      flexWrap: "wrap",
+    },
+    badge: {
+      display: "inline-block",
+      padding: "6px 10px",
+      borderRadius: 999,
+      background: "rgba(52,211,153,0.14)",
+      border: "1px solid rgba(52,211,153,0.38)",
+      color: "#baf7d6",
+      fontSize: 12,
+      fontWeight: 800,
+      letterSpacing: 0.3,
+      marginBottom: 8,
     },
     title: { fontSize: "clamp(24px, 4.8vw, 36px)", fontWeight: 900, color: "#F6FAFF", margin: 0 },
     sub: { opacity: 0.9 },
@@ -117,8 +130,11 @@ function WellnessActivities({ setScreen }) {
     <div style={ui.page}>
       <div style={ui.wrap}>
         {/* Title and active category */}
+        <div style={{ marginBottom: 10 }}>
+          <div style={ui.badge}>Ready-to-use wellness routines</div>
+        </div>
         <div style={ui.head}>
-          <h2 style={ui.title}>Wellness Activities</h2>
+          <h2 style={ui.title}>Wellness Toolkit</h2>
           <div style={ui.sub}>{selectedType}</div>
         </div>
 

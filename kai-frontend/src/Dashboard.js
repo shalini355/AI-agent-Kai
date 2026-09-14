@@ -277,8 +277,8 @@ function Dashboard({ onNavigate }) {
           <div style={styles.titleWrap}>
             <div style={styles.logo}>K</div>
             <div>
-              <h1 style={styles.title}>Dashboard</h1>
-              <div style={styles.subtitle}>AI-driven wellness insights</div>
+              <h1 style={styles.title}>KAI Dashboard</h1>
+              <div style={styles.subtitle}>Personal wellness overview</div>
             </div>
           </div>
 
@@ -294,19 +294,19 @@ function Dashboard({ onNavigate }) {
 
         <div style={styles.topRow}>
           <div style={styles.statCard}>
-            <div style={styles.statLabel}>Current Mood</div>
+            <div style={styles.statLabel}>Latest Mood Check-in</div>
             <div style={styles.statValue}>{latestMood ? latestMood.mood : "Neutral"}</div>
             <div style={styles.statMeta}>{latestMood ? `${latestMood.score}/10` : "0/10"}</div>
           </div>
           <div style={styles.statCard}>
-            <div style={styles.statLabel}>Average Score</div>
+            <div style={styles.statLabel}>Mood Trend</div>
             <div style={styles.statValue}>{averageScore}</div>
-            <div style={styles.statMeta}>Based on recent check-ins</div>
+            <div style={styles.statMeta}>Average across recent check-ins</div>
           </div>
           <div style={styles.statCard}>
-            <div style={styles.statLabel}>History Entries</div>
+            <div style={styles.statLabel}>Saved Insights</div>
             <div style={styles.statValue}>{moodHistory.length}</div>
-            <div style={styles.statMeta}>Saved locally in this browser</div>
+            <div style={styles.statMeta}>Tracked on this device for quick review</div>
           </div>
         </div>
 

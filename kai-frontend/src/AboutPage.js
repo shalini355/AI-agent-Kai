@@ -173,9 +173,10 @@ function AboutPage({ onBack }) {
         <div style={hero}>
           <h1 style={h1}>About KAI</h1>
           <p style={lead}>
-            KAI is an AI‑powered wellness companion that helps people track moods,
-            reflect through journaling, and find trustworthy resources—privately and
-            compassionately.
+            KAI is a production-ready AI wellness companion built over the past year
+            through design iteration, user feedback, and continuous engineering
+            refinement. It helps people track moods, reflect with clarity, and find
+            practical support in a calm, trustworthy experience.
           </p>
         </div>
 
@@ -227,21 +228,21 @@ function AboutPage({ onBack }) {
           <div style={split(6)}>
             <h2 style={h2}>The Team</h2>
             <p style={p}>
-              A small, cross‑functional crew of designers, clinicians, and engineers
-              building supportive technology with care.
+              A focused team of designers and engineers building a wellness product
+              that feels supportive, useful, and ready for everyday use.
             </p>
             <div style={stats}>
               <div style={stat}>
-                <div style={statNum}>3+</div>
-                <div style={statLabel}>Years building KAI</div>
+                <div style={statNum}>1</div>
+                <div style={statLabel}>Year of product development</div>
               </div>
               <div style={stat}>
-                <div style={statNum}>25K+</div>
-                <div style={statLabel}>Monthly check‑ins</div>
+                <div style={statNum}>100%</div>
+                <div style={statLabel}>Focus on user-centered design</div>
               </div>
               <div style={stat}>
-                <div style={statNum}>92%</div>
-                <div style={statLabel}>User satisfaction</div>
+                <div style={statNum}>Daily</div>
+                <div style={statLabel}>Wellness improvements through feedback</div>
               </div>
             </div>
           </div>
@@ -260,9 +261,9 @@ function AboutPage({ onBack }) {
           <div style={split(12)}>
             <h2 style={h2}>Milestones</h2>
             <ul style={list}>
-              <li style={li}><strong>2023:</strong> Early prototype and first 1,000 users.</li>
-              <li style={li}><strong>2024:</strong> Journaling, insights, and resources library launched.</li>
-              <li style={li}><strong>2025:</strong> Personalized guidance and wellness programs introduced.</li>
+              <li style={li}><strong>Year 1:</strong> Product research, concept validation, and UX exploration.</li>
+              <li style={li}><strong>Year 1:</strong> Core MVP launch with AI chat, mood tracking, and curated resources.</li>
+              <li style={li}><strong>Today:</strong> Production-oriented refinement for a ready-to-use wellness experience.</li>
             </ul>
           </div>
         </div>
