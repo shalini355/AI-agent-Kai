@@ -1,10 +1,49 @@
-import React, { useState } from "react";
-import { analyzeMood } from "./moodUtils"; // from previous step
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Area,
+  AreaChart,
+} from "recharts";
+import { analyzeMood } from "./moodUtils";
 
 function Dashboard({ onNavigate }) {
   const [showChecker, setShowChecker] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [text, setText] = useState("");
   const [result, setResult] = useState(null);
+  const [moodHistory, setMoodHistory] = useState([]);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("kai_mood_history") || "[]");
+      setMoodHistory(stored);
+    } catch (error) {
+      console.error("Failed to load mood history", error);
+    }
+  }, []);
+
+  const chartData = useMemo(() => {
+    return moodHistory.map((entry, index) => ({
+      name: index === 0 ? "Now" : `${index + 1}`,
+      score: entry.score,
+      mood: entry.mood,
+      time: new Date(entry.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    }));
+  }, [moodHistory]);
+
+  const latestMood = moodHistory[moodHistory.length - 1];
+  const averageScore =
+    moodHistory.length === 0
+      ? 0
+      : Math.round(
+          moodHistory.reduce((total, item) => total + Number(item.score || 0), 0) / moodHistory.length
+        );
 
   const colors = {
     bgFrom: "#0b1220",
@@ -29,34 +68,72 @@ function Dashboard({ onNavigate }) {
     },
     card: {
       width: "100%",
-      maxWidth: 920,
+      maxWidth: 1100,
       background: colors.card,
       border: `1px solid ${colors.border}`,
-      borderRadius: 20,
+      borderRadius: 24,
       padding: 24,
       boxShadow: "0 16px 48px rgba(0,0,0,.45)",
-      backdropFilter: "blur(6px)",
+      backdropFilter: "blur(16px)",
+      WebkitBackdropFilter: "blur(16px)",
     },
     header: {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 14,
+      marginBottom: 18,
+      gap: 12,
+      flexWrap: "wrap",
     },
     titleWrap: { display: "flex", alignItems: "center", gap: 12 },
     logo: {
-      width: 36,
-      height: 36,
-      borderRadius: 10,
-      background:
-        "linear-gradient(135deg, rgba(52,211,153,0.85), rgba(59,130,246,0.85))",
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      background: "linear-gradient(135deg, rgba(52,211,153,0.85), rgba(59,130,246,0.85))",
       display: "grid",
       placeItems: "center",
       color: "#0a1220",
       fontWeight: 900,
+      fontSize: 20,
     },
-    title: { fontSize: 26, fontWeight: 900, color: colors.heading, margin: 0 },
+    title: { fontSize: 30, fontWeight: 900, color: colors.heading, margin: 0 },
     subtitle: { opacity: 0.9, fontSize: 14 },
+    headerActions: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" },
+    button: {
+      padding: "10px 14px",
+      borderRadius: 12,
+      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(255,255,255,0.08)",
+      color: "#fff",
+      fontWeight: 800,
+      cursor: "pointer",
+    },
+    buttonPrimary: {
+      padding: "10px 14px",
+      borderRadius: 12,
+      border: "none",
+      background: "linear-gradient(135deg, #5eead4, #7dd3fc)",
+      color: "#04111d",
+      fontWeight: 900,
+      cursor: "pointer",
+    },
+    topRow: {
+      display: "grid",
+      gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+      gap: 16,
+      marginBottom: 16,
+    },
+    statCard: {
+      background: "rgba(255,255,255,0.06)",
+      border: `1px solid ${colors.border}`,
+      borderRadius: 18,
+      padding: 16,
+      boxShadow: "0 10px 20px rgba(0,0,0,0.14)",
+    },
+    statLabel: { fontSize: 12, opacity: 0.75, marginBottom: 6 },
+    statValue: { fontWeight: 900, fontSize: 28, color: colors.heading },
+    statMeta: { marginTop: 4, fontSize: 12, opacity: 0.8 },
     grid: {
       display: "grid",
       gridTemplateColumns: "repeat(12, 1fr)",
@@ -94,8 +171,6 @@ function Dashboard({ onNavigate }) {
     purple: { background: "linear-gradient(135deg,#6d28d9,#7c3aed)" },
     green: { background: "linear-gradient(135deg,#0f766e,#16a34a)" },
     yellow: { background: "linear-gradient(135deg,#ca8a04,#f59e0b)" },
-
-    // inline mood checker panel
     panel: {
       gridColumn: "span 12",
       marginTop: 8,
@@ -142,6 +217,39 @@ function Dashboard({ onNavigate }) {
       fontWeight: 800,
       marginLeft: 8,
       fontSize: 12,
+      textTransform: "capitalize",
+    },
+    drawerBackdrop: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(2, 6, 23, 0.54)",
+      backdropFilter: "blur(4px)",
+      display: "flex",
+      justifyContent: "flex-end",
+      zIndex: 50,
+    },
+    drawer: {
+      width: "min(520px, 90vw)",
+      height: "100%",
+      background: "rgba(13,20,32,0.96)",
+      borderLeft: "1px solid rgba(255,255,255,0.12)",
+      boxShadow: "-30px 0 60px rgba(2,6,23,0.34)",
+      padding: 24,
+    },
+    drawerHeader: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 16,
+    },
+    drawerTitle: { margin: 0, fontSize: 24, fontWeight: 900, color: colors.heading },
+    chartWrapper: { height: 260, marginTop: 12 },
+    empty: {
+      textAlign: "center",
+      padding: "32px 12px",
+      borderRadius: 16,
+      border: `1px dashed ${colors.border}`,
+      opacity: 0.85,
     },
   };
 
@@ -170,8 +278,35 @@ function Dashboard({ onNavigate }) {
             <div style={styles.logo}>K</div>
             <div>
               <h1 style={styles.title}>Dashboard</h1>
-              <div style={styles.subtitle}>Quick actions and tools</div>
+              <div style={styles.subtitle}>AI-driven wellness insights</div>
             </div>
+          </div>
+
+          <div style={styles.headerActions}>
+            <button style={styles.buttonPrimary} onClick={() => setShowHistory(true)}>
+              Mood History
+            </button>
+            <button style={styles.button} onClick={() => onNavigate("chat")}>
+              Chat with Kai
+            </button>
+          </div>
+        </div>
+
+        <div style={styles.topRow}>
+          <div style={styles.statCard}>
+            <div style={styles.statLabel}>Current Mood</div>
+            <div style={styles.statValue}>{latestMood ? latestMood.mood : "Neutral"}</div>
+            <div style={styles.statMeta}>{latestMood ? `${latestMood.score}/10` : "0/10"}</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statLabel}>Average Score</div>
+            <div style={styles.statValue}>{averageScore}</div>
+            <div style={styles.statMeta}>Based on recent check-ins</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statLabel}>History Entries</div>
+            <div style={styles.statValue}>{moodHistory.length}</div>
+            <div style={styles.statMeta}>Saved locally in this browser</div>
           </div>
         </div>
 
@@ -215,7 +350,6 @@ function Dashboard({ onNavigate }) {
             </div>
           </div>
 
-          {/* Mood Checker tile replaces Settings */}
           <div
             style={{ ...styles.tile, ...span, borderColor: "rgba(234,179,8,.35)" }}
             onMouseOver={raise}
@@ -257,6 +391,48 @@ function Dashboard({ onNavigate }) {
           )}
         </div>
       </div>
+
+      {showHistory && (
+        <div style={styles.drawerBackdrop} onClick={() => setShowHistory(false)}>
+          <div style={styles.drawer} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.drawerHeader}>
+              <h3 style={styles.drawerTitle}>Mood History</h3>
+              <button style={styles.button} onClick={() => setShowHistory(false)}>
+                Close
+              </button>
+            </div>
+
+            {chartData.length > 0 ? (
+              <div style={styles.chartWrapper}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="aiMoodGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#5eead4" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#7dd3fc" stopOpacity={0.15} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
+                    <XAxis dataKey="time" stroke="#dfeeff" tickLine={false} axisLine={false} />
+                    <YAxis domain={[1, 10]} stroke="#dfeeff" tickLine={false} axisLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "rgba(15, 23, 42, 0.96)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        borderRadius: 12,
+                        color: "#edf5ff",
+                      }}
+                    />
+                    <Area type="monotone" dataKey="score" stroke="#5eead4" fill="url(#aiMoodGradient)" strokeWidth={3} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div style={styles.empty}>No mood history yet. Start chatting with Kai to build your insight timeline.</div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
