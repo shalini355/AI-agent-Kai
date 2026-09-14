@@ -11,6 +11,60 @@ if (!apiKey) {
 
 const client = apiKey ? new Mistral({ apiKey }) : null;
 
+function inferMood(message) {
+  const text = message.toLowerCase();
+
+  if (
+    /(happy|good|excited|great|energetic|joy|relieved|peaceful|calm)/i.test(text)
+  ) {
+    return "happy";
+  }
+
+  if (/(anxious|worried|stressed|overwhelmed|panic|nervous|tensed)/i.test(text)) {
+    return "anxious";
+  }
+
+  if (/(sad|down|lonely|hurt|empty|depressed|crying)/i.test(text)) {
+    return "sad";
+  }
+
+  if (/(calm|okay|fine|steady|grounded|peaceful|safe)/i.test(text)) {
+    return "calm";
+  }
+
+  return "neutral";
+}
+
+function buildFallbackReply(message) {
+  const mood = inferMood(message);
+  const score = mood === "happy" ? 8 : mood === "calm" ? 7 : mood === "anxious" ? 4 : mood === "sad" ? 3 : 5;
+
+  const fallbackReplies = {
+    happy: "I’m really glad you’re feeling good today. Keep nurturing that momentum and take a moment to enjoy it.",
+    calm: "That sounds steady and grounded. Keep protecting this calm energy and take it one gentle step at a time.",
+    anxious: "I’m hearing that you’re feeling a bit overwhelmed. Try a slow breath in for 4, hold for 4, out for 6, and let’s take this one moment at a time.",
+    sad: "I’m sorry you’re carrying that heaviness right now. You don’t have to handle it all at once — start with one small comforting step.",
+    neutral: "Thanks for sharing that with me. I’m here with you, and we can take this conversation at your pace.",
+  };
+
+  return {
+    reply: fallbackReplies[mood],
+    mood,
+    sentiment: { mood, score },
+  };
+}
+
+function isRateLimited(error) {
+  const body = error?.body ?? {};
+  const bodyText = typeof body === "string" ? body : JSON.stringify(body);
+
+  return (
+    error?.statusCode === 429 ||
+    bodyText.toLowerCase().includes("rate limit") ||
+    bodyText.toLowerCase().includes("rate_limited")
+  );
+}
+
 export async function getKaiReply(message) {
   if (!client) {
     return {
@@ -60,6 +114,15 @@ export async function getKaiReply(message) {
     };
   } catch (error) {
     console.error("Mistral API error:", error);
+
+    if (isRateLimited(error)) {
+      const fallback = buildFallbackReply(message);
+      return {
+        reply: `${fallback.reply} Kai’s AI service is temporarily rate-limited, but I’m still here to support you right now.`,
+        mood: fallback.mood,
+        sentiment: fallback.sentiment,
+      };
+    }
 
     return {
       reply:
