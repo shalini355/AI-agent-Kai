@@ -31,11 +31,7 @@ app.get("/api/health", (_req, res) => {
 if (fs.existsSync(buildPath) && fs.existsSync(indexPath)) {
   app.use(express.static(buildPath));
 
-  app.get("*", (req, res) => {
-    if (req.path.startsWith("/api/")) {
-      return res.status(404).json({ error: "Not found" });
-    }
-
+  app.get(/^(?!\/api\/).*/, (req, res) => {
     return res.sendFile(indexPath);
   });
 }
