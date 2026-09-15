@@ -1,6 +1,8 @@
-# Kai — Empathetic AI Wellness Agent
+# Kai: Empathetic AI Wellness Agent
 
-> A polished full-stack wellness companion that blends empathetic AI chat, multilingual support, and mood tracking in a modern glassmorphism UI.
+Kai is a full-stack wellness companion that combines empathetic AI chat, mood check-ins, practical activities, support resources, and privacy-aware onboarding in one responsive React experience.
+
+> Kai is a wellness support tool, not a medical professional, therapist, diagnosis service, or emergency response service. In an emergency or if there is a risk of harm, contact local emergency services or a crisis hotline.
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
 ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)
@@ -8,54 +10,68 @@
 ![Express](https://img.shields.io/badge/Express.js-000000?style=flat&logo=express&logoColor=white)
 ![Mistral](https://img.shields.io/badge/Mistral-AI-FF6B6B?style=flat)
 
-## Overview
+## What the app includes
 
-Kai is a full-stack AI wellness assistant designed to feel supportive, culturally aware, and natural in daily conversation. It responds in both English and Hinglish, tracks mood sentiment over time, and presents a clean, responsive dashboard for users to review their emotional patterns.
+- Welcome experience with light/dark theme switching and persistent theme preference
+- Consent gate with in-app Privacy Policy and Terms of Use content
+- Empathetic KAI chat powered by Mistral, with English and Hinglish support
+- Mood sentiment metadata and score updates from chat responses
+- Dashboard mood checker with saved notes, latest mood, average score, and history chart
+- Wellness activities for journaling, breathing, affirmations, stretching, meditation, and gratitude
+- Resource Navigator with direct email, phone, SMS, and external guide actions
+- Settings for theme, compact chat preference, local data export/deletion actions, and sign-out UI
+- Contact Us form with support contact details
+- About page and consistent back navigation across secondary screens
+- Express health checks, structured routes/controllers/services, and an AI fallback response when Mistral is unavailable
 
-## Features
+## Technology
 
-- Real-time AI chat with an empathetic wellness-focused system prompt
-- English + Hinglish conversational support
-- Mood tracking with sentiment metadata and local history
-- Modern glassmorphism dark UI for the frontend
-- Recharts-powered mood history insights
-- Clean backend architecture with route, controller, and service separation
+| Area | Technology |
+| --- | --- |
+| Frontend | React 19, Create React App, inline component styles |
+| Charts | Recharts |
+| HTTP | Browser Fetch API, REST JSON |
+| Backend | Node.js, Express 5, CORS, dotenv |
+| AI provider | Mistral AI SDK using `mistral-small-latest` |
+| Persistence | Browser `localStorage`; no database is currently required |
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React, CSS3, Recharts |
-| Backend | Node.js, Express |
-| AI | Mistral AI SDK |
-| API | REST |
-
-## Project Structure
+## Repository layout
 
 ```text
 AI-agent-Kai/
 ├── README.md
 ├── kai-backend/
-│   ├── .env
+│   ├── server.js                 # Express server and static build hosting
 │   ├── package.json
-│   ├── server.js
 │   ├── controllers/
+│   │   └── chatController.js     # Request validation and response handling
 │   ├── routes/
+│   │   └── chatRoutes.js         # Chat and route-level health endpoint
 │   └── services/
-├── kai-frontend/
-│   ├── package.json
-│   ├── public/
-│   └── src/
-└── .gitignore
+│       └── mistralService.js     # Mistral integration and fallback replies
+└── kai-frontend/
+		├── package.json
+		├── public/
+		└── src/
+				├── App.js                # App shell, navigation, theme, consent state
+				├── Chat.jsx              # AI conversation UI and sentiment persistence
+				├── Dashboard.js          # Mood overview, checker, and chart
+				├── ConsentModal.js       # Privacy and terms flow
+				├── WellnessActivities.js # Interactive activity toolkit
+				├── Resources.js          # Support and crisis resource actions
+				├── Settings.js
+				├── ContactUs.js
+				├── AboutPage.js
+				└── moodUtils.js          # Local mood keyword analysis
 ```
 
-## Getting Started
+## Requirements
 
-### Prerequisites
-
-- Node.js 18+
+- Node.js 18 or newer
 - npm
-- A valid Mistral API key
+- A Mistral API key for live AI responses
+
+## Local setup
 
 ### 1. Clone the repository
 
@@ -74,47 +90,151 @@ cd ../kai-frontend
 npm install
 ```
 
-### 3. Configure environment variables
+### 3. Configure the backend
 
-Create a `.env` file inside `kai-backend/` with:
+Create `kai-backend/.env`:
 
 ```env
 MISTRAL_API_KEY=your_mistral_api_key_here
 PORT=5000
 ```
 
-### 4. Run the app locally
+Never commit `.env` or expose the Mistral key in frontend code. The backend logs a warning and returns a clear unavailable response when the key is missing.
 
-Start the backend:
+### 4. Start development servers
+
+Use two terminals:
+
+Terminal 1:
 
 ```bash
 cd kai-backend
 npm start
 ```
 
-Start the frontend in a second terminal:
+Terminal 2:
 
 ```bash
 cd kai-frontend
 npm start
 ```
 
-### Local preview
+Open [http://localhost:3000](http://localhost:3000). The frontend sends chat requests to `http://localhost:5000/api/chat`.
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000/api/health
-- Chat endpoint: http://localhost:5000/api/chat
+## Available commands
 
-## Notes
+### Backend
 
-- The backend serves the built frontend when a production build exists.
-- Mood history is saved locally in the browser for quick insights.
-- The app is configured to use `MISTRAL_API_KEY` for its AI provider.
+```bash
+npm start       # Start the Express server
+npm run dev     # Start with Node's watch mode
+```
 
-## Why Kai?
+### Frontend
 
-Kai aims to make emotional support more accessible, human-centered, and culturally aware by combining conversational AI with practical wellness tools.
+```bash
+npm start       # Start the development server
+npm run build   # Create a production build
+npm test        # Run the Create React App test runner
+```
 
-## Connect
+The current frontend build has been verified with `npm run build`.
 
-**Shalini Yadav** — [LinkedIn](https://linkedin.com/in/shaliniyadav-355abc) · [GitHub](https://github.com/shalini355)
+## API reference
+
+### `GET /api/health`
+
+Returns backend status:
+
+```json
+{
+	"ok": true,
+	"service": "kai-backend"
+}
+```
+
+### `GET /api/chat/health`
+
+Returns the same health response from the chat router.
+
+### `POST /api/chat`
+
+Request:
+
+```json
+{
+	"message": "I feel anxious about tomorrow"
+}
+```
+
+Successful response shape:
+
+```json
+{
+	"reply": "...",
+	"mood": "anxious",
+	"sentiment": {
+		"mood": "anxious",
+		"score": 4
+	}
+}
+```
+
+An empty message returns HTTP `400`. Provider or server failures return a neutral fallback response rather than exposing provider errors to the user.
+
+### `POST /ai-mood`
+
+Legacy-compatible alias for the same chat controller and request/response contract as `POST /api/chat`.
+
+## Client-side data
+
+Kai currently uses browser storage instead of a database:
+
+| Key | Contents |
+| --- | --- |
+| `kai_theme` | `dark` or `light` theme preference |
+| `kai_mood_history` | JSON array of mood scores, timestamps, and check-in notes |
+
+Data is local to the browser profile. Clearing site data removes these values. The app does not currently provide server-side accounts, synchronization, or database-backed storage.
+
+## Production deployment
+
+Build the frontend first:
+
+```bash
+cd kai-frontend
+npm run build
+```
+
+The Express server serves static frontend files when `kai-backend/build/index.html` exists. To deploy the combined app, copy the generated frontend `build` directory into `kai-backend/build`, configure the backend environment, and start the backend:
+
+```bash
+cd kai-frontend
+npm run build
+
+# Copy kai-frontend/build to kai-backend/build using your platform's file-copy command.
+
+cd ../kai-backend
+npm start
+```
+
+The combined application is then available from the backend port, normally [http://localhost:5000](http://localhost:5000). API routes remain under `/api/*`; non-API routes fall back to the React `index.html`.
+
+## Privacy and safety notes
+
+- Consent is required before entering the dashboard.
+- The Privacy Policy and Terms of Use are displayed inside the consent flow.
+- Chat and mood history are intended for personal wellness reflection and are stored locally by the current implementation.
+- Do not share passwords, API keys, financial details, or other unnecessary sensitive information in chat.
+- KAI must not be relied on for diagnosis, treatment decisions, or crisis response.
+
+## Contributing
+
+1. Create a focused branch from `main`.
+2. Keep frontend and backend changes scoped to the relevant package.
+3. Run `npm run build` in `kai-frontend` before opening a pull request.
+4. Do not commit `.env`, API keys, `node_modules`, or generated build output.
+
+## Maintainer
+
+**Shalini Yadav**: [LinkedIn](https://linkedin.com/in/shaliniyadav-355abc) · [GitHub](https://github.com/shalini355)
