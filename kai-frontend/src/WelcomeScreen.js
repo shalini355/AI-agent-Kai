@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
-function WelcomeScreen({ onNext, onContact, onAbout }) {
+function WelcomeScreen({ onNext, onContact, onAbout, theme = "dark", setTheme }) {
   const bgUrl =
     "https://images.pexels.com/photos/33942904/pexels-photo-33942904.jpeg";
 
-  // Local theme state
-  const [theme, setTheme] = useState("dark"); // 'dark' | 'light'
-  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+  const toggleTheme = () => {
+    if (setTheme) {
+      setTheme((current) => (current === "dark" ? "light" : "dark"));
+    }
+  };
 
-  // Theme palettes
   const palette = useMemo(
     () =>
       theme === "dark"

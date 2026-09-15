@@ -45,12 +45,22 @@ const sentimentPalettes = {
 function App() {
   const [page, setPage] = useState("welcome");
   const [consent, setConsent] = useState(false);
-  const [theme, setTheme] = useState(() => localStorage.getItem("kai_theme") || "dark");
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem("kai_theme") || "dark";
+    } catch (error) {
+      return "dark";
+    }
+  });
   const [ambientMood, setAmbientMood] = useState("calm");
   const [ambientScore, setAmbientScore] = useState(7);
 
   useEffect(() => {
-    localStorage.setItem("kai_theme", theme);
+    try {
+      localStorage.setItem("kai_theme", theme);
+    } catch (error) {
+      console.error("Failed to persist theme", error);
+    }
   }, [theme]);
 
   const palettes = {
@@ -138,13 +148,17 @@ function App() {
         boxShadow: `0 0 18px ${currentPalette.accent}`,
       },
     }),
-    [ambientMood, consent, currentPalette, pal, page, theme]
+    [consent, currentPalette, pal, page]
   );
 
   const handleSentimentChange = (sentiment) => {
     if (!sentiment || !sentiment.mood) return;
     setAmbientMood(sentiment.mood);
     setAmbientScore(sentiment.score || 5);
+  };
+
+  const toggleTheme = () => {
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
   };
 
   const renderPage = () => {
@@ -167,6 +181,12 @@ function App() {
             setConsent(true);
             setPage("dashboard");
           }}
+          onDecline={() => {
+            setConsent(false);
+            setPage("welcome");
+          }}
+          onViewPolicy={() => {}}
+          onViewTerms={() => {}}
         />
       );
     }
@@ -204,6 +224,16 @@ function App() {
           <span style={styles.link} onClick={() => setPage("about")}>About Us</span>
           <span style={styles.link} onClick={() => setPage("contact")}>Contact Us</span>
           <span style={styles.link} onClick={() => setPage("settings")}>Settings</span>
+          <button
+            onClick={toggleTheme}
+            style={{
+              ...styles.link,
+              background: theme === "dark" ? "rgba(14,165,233,0.18)" : "rgba(13,148,136,0.12)",
+              fontWeight: 800,
+            }}
+          >
+            {theme === "dark" ? "🌙 Dark" : "🌞 Light"}
+          </button>
           <span
             style={{ ...styles.link, background: theme === "dark" ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.2)" }}
             onClick={() => {

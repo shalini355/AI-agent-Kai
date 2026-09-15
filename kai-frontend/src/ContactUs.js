@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 
-function ContactUs({ onBack, onSubmitSuccess }) {
+function ContactUs({ onBack, onSubmitSuccess, theme = "dark" }) {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const isDark = theme === "dark";
 
   const page = {
     minHeight: "100vh",
-    background: "linear-gradient(135deg,#0b1220 0%, #141a2b 100%)",
-    color: "#e7ecf3",
+    background: isDark ? "linear-gradient(135deg,#0b1220 0%, #141a2b 100%)" : "linear-gradient(135deg,#f5f7fb 0%, #ffffff 100%)",
+    color: isDark ? "#e7ecf3" : "#0f172a",
     fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif",
   };
   const container = { maxWidth: 960, margin: "0 auto", padding: "24px" };
@@ -16,29 +17,29 @@ function ContactUs({ onBack, onSubmitSuccess }) {
   const back = {
     padding: "8px 12px",
     borderRadius: 10,
-    background: "rgba(255,255,255,0.08)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    color: "#fff",
+    background: isDark ? "rgba(255,255,255,0.08)" : "rgba(2,6,23,0.04)",
+    border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(2,6,23,0.08)"}`,
+    color: isDark ? "#fff" : "#0f172a",
     cursor: "pointer",
   };
   const card = {
-    background: "#0e1829",
-    border: "1px solid rgba(255,255,255,0.10)",
+    background: isDark ? "#0e1829" : "rgba(255,255,255,0.9)",
+    border: `1px solid ${isDark ? "rgba(255,255,255,0.10)" : "rgba(2,6,23,0.08)"}`,
     borderRadius: 16,
     padding: 24,
-    boxShadow: "0 10px 28px rgba(0,0,0,.35)",
+    boxShadow: isDark ? "0 10px 28px rgba(0,0,0,.35)" : "0 10px 28px rgba(2,6,23,0.08)",
   };
-  const h1 = { fontSize: 32, fontWeight: 900, color: "#f6faff", margin: "0 0 8px" };
+  const h1 = { fontSize: 32, fontWeight: 900, color: isDark ? "#f6faff" : "#0f172a", margin: "0 0 8px" };
   const sub = { opacity: 0.9, marginBottom: 18 };
   const row = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 };
   const col = { display: "flex", flexDirection: "column", gap: 8 };
-  const label = { fontWeight: 700, color: "#f6faff" };
+  const label = { fontWeight: 700, color: isDark ? "#f6faff" : "#0f172a" };
   const input = {
     padding: "12px 14px",
     borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.14)",
-    background: "rgba(255,255,255,0.06)",
-    color: "#fff",
+    border: `1px solid ${isDark ? "rgba(255,255,255,0.14)" : "rgba(2,6,23,0.12)"}`,
+    background: isDark ? "rgba(255,255,255,0.06)" : "rgba(2,6,23,0.02)",
+    color: isDark ? "#fff" : "#0f172a",
     outline: "none",
   };
   const textarea = { ...input, minHeight: 140, resize: "vertical" };
@@ -59,9 +60,9 @@ function ContactUs({ onBack, onSubmitSuccess }) {
   };
   const ghost = {
     ...btn,
-    background: "rgba(255,255,255,0.08)",
-    color: "#fff",
-    border: "1px solid rgba(255,255,255,0.12)",
+    background: isDark ? "rgba(255,255,255,0.08)" : "rgba(2,6,23,0.04)",
+    color: isDark ? "#fff" : "#0f172a",
+    border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(2,6,23,0.08)"}`,
   };
   const success = {
     marginTop: 16,
@@ -147,9 +148,8 @@ function ContactUs({ onBack, onSubmitSuccess }) {
             {sent && <div style={success}>Thanks! Your message has been sent.</div>}
           </form>
 
-          {/* Optional contact info */}
           <div style={{ marginTop: 20, opacity: 0.9 }}>
-            Email: support@kai.app • Phone: +91 98xx-xxx-xxx
+            Email: hello@kaiwellness.app • Phone: +91 98765 43210
           </div>
         </div>
       </div>

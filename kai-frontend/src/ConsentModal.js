@@ -2,6 +2,89 @@ import React, { useState } from "react";
 
 function ConsentModal({ onConsent, onViewPolicy, onViewTerms, onDecline }) {
   const [checked, setChecked] = useState(false);
+  const [view, setView] = useState(null);
+
+  const handleViewPolicy = () => {
+    setView("policy");
+    if (onViewPolicy) onViewPolicy();
+  };
+
+  const handleViewTerms = () => {
+    setView("terms");
+    if (onViewTerms) onViewTerms();
+  };
+
+  const renderPolicyView = () => (
+    <div>
+      <h3 style={{ margin: "0 0 12px", color: "#F6FAFF" }}>Privacy Policy</h3>
+      <p style={{ margin: "0 0 10px" }}>
+        KAI collects only the information you choose to share in your wellness check-ins and chat sessions to improve support quality and safety.
+      </p>
+      <p style={{ margin: "0 0 10px" }}>
+        We do not sell personal data, and we limit access to stored mood and conversation data to your device and authorized app maintenance.
+      </p>
+      <p style={{ margin: 0 }}>
+        Usage patterns may be aggregated in anonymized form to help improve the product experience, but no private details are shared publicly.
+      </p>
+    </div>
+  );
+
+  const renderTermsView = () => (
+    <div>
+      <h3 style={{ margin: "0 0 12px", color: "#F6FAFF" }}>Terms of Use</h3>
+      <p style={{ margin: "0 0 10px" }}>
+        KAI is a wellness support companion and is not a replacement for licensed medical care, therapy, or emergency response.
+      </p>
+      <p style={{ margin: "0 0 10px" }}>
+        You are responsible for evaluating any guidance you receive and seeking qualified care when needed, especially for serious or urgent concerns.
+      </p>
+      <p style={{ margin: 0 }}>
+        By continuing, you agree to use the app responsibly, protect your personal information, and avoid sharing sensitive data beyond what is necessary.
+      </p>
+    </div>
+  );
+
+  const renderMainView = () => (
+    <>
+      <p style={styles.intro}>
+        To continue, please review and accept our privacy and usage terms for KAI’s wellness features.
+      </p>
+
+      <ul style={styles.list}>
+        <li style={styles.li}>
+          Conversations are intended for wellness support and self-reflection; they are not a substitute for professional care or emergency services.
+        </li>
+        <li style={styles.li}>
+          Data is handled with care and stored securely with limited access; sensitive information is not sold or used for ads.
+        </li>
+        <li style={styles.li}>
+          Aggregated and anonymized usage metrics may be used to improve features and safety.
+        </li>
+      </ul>
+
+      <div style={styles.callout}>
+        If this is an emergency or there is risk of harm, contact local emergency services or a crisis hotline in your area.
+      </div>
+
+      <div style={styles.checkboxRow}>
+        <input
+          type="checkbox"
+          style={styles.checkbox}
+          id="agree"
+          checked={checked}
+          onChange={(e) => setChecked(e.target.checked)}
+        />
+        <label htmlFor="agree">
+          I have read and agree to the Privacy Policy and Terms of Use, and I understand KAI is for wellness support only.
+        </label>
+      </div>
+
+      <div style={styles.linkBar}>
+        <span style={styles.link} onClick={handleViewPolicy}>View Privacy Policy</span>
+        <span style={styles.link} onClick={handleViewTerms}>View Terms of Use</span>
+      </div>
+    </>
+  );
 
   const styles = {
     overlay: {
@@ -129,47 +212,7 @@ function ConsentModal({ onConsent, onViewPolicy, onViewTerms, onDecline }) {
         </div>
 
         <div style={styles.body}>
-          <p style={styles.intro}>
-            To continue, please review and accept our privacy and usage terms for KAI’s wellness features.
-          </p>
-
-          <ul style={styles.list}>
-            <li style={styles.li}>
-              Conversations are intended for wellness support and self‑reflection; they are not a substitute for professional care or emergency services.
-            </li>
-            <li style={styles.li}>
-              Data is handled with care and stored securely with limited access; sensitive information is not sold or used for ads.
-            </li>
-            <li style={styles.li}>
-              Aggregated and anonymized usage metrics may be used to improve features and safety.
-            </li>
-          </ul>
-
-          <div style={styles.callout}>
-            If this is an emergency or there is risk of harm, contact local emergency services or a crisis hotline in your area.
-          </div>
-
-          <div style={styles.checkboxRow}>
-            <input
-              type="checkbox"
-              style={styles.checkbox}
-              id="agree"
-              checked={checked}
-              onChange={(e) => setChecked(e.target.checked)}
-            />
-            <label htmlFor="agree">
-              I have read and agree to the Privacy Policy and Terms of Use, and I understand KAI is for wellness support only.
-            </label>
-          </div>
-
-          <div style={styles.linkBar}>
-            <span style={styles.link} onClick={onViewPolicy}>
-              View Privacy Policy
-            </span>
-            <span style={styles.link} onClick={onViewTerms}>
-              View Terms of Use
-            </span>
-          </div>
+          {view === "policy" ? renderPolicyView() : view === "terms" ? renderTermsView() : renderMainView()}
         </div>
 
         <div style={styles.footer}>
@@ -182,10 +225,10 @@ function ConsentModal({ onConsent, onViewPolicy, onViewTerms, onDecline }) {
           >
             I Agree and Continue
           </button>
-          <button style={{ ...styles.btn, ...styles.secondary }} onClick={onViewPolicy}>
+          <button style={{ ...styles.btn, ...styles.secondary }} onClick={handleViewPolicy}>
             Read Policy
           </button>
-          <button style={{ ...styles.btn, ...styles.danger }} onClick={onDecline}>
+          <button style={{ ...styles.btn, ...styles.danger }} onClick={() => (onDecline ? onDecline() : setView(null))}>
             Decline
           </button>
         </div>

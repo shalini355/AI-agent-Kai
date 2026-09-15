@@ -1,18 +1,19 @@
 import React from "react";
 
-function Resources() {
+function Resources({ theme = "dark" }) {
+  const isDark = theme === "dark";
   const resources = [
-    { name: "Mental Health Helpline (India)", link: "tel:1800233", icon: "📞" },
-    { name: "Childline 1098 (India)", link: "tel:1098", icon: "👧" },
-    { name: "Talk to a Counselor", link: "https://www.therapistindia.com", icon: "🗣️" },
-    { name: "Mental Health Info (US)", link: "https://www.mentalhealth.gov", icon: "📘" },
+    { name: "KAI Support Team", detail: "hello@kaiwellness.app", link: "mailto:hello@kaiwellness.app", icon: "✉️" },
+    { name: "Emergency Lifeline", detail: "Call 112 / local emergency number", link: "tel:112", icon: "🚨" },
+    { name: "Crisis Textline", detail: "Text HOME to 741741", link: "sms:741741?body=HOME", icon: "💬" },
+    { name: "National Care Guide", detail: "www.mentalhealth.gov", link: "https://www.mentalhealth.gov", icon: "📘" },
   ];
 
   const ui = {
     page: {
       minHeight: "100vh",
-      background: "linear-gradient(135deg, #0b1220 0%, #141a2b 100%)",
-      color: "#e7ecf3",
+      background: isDark ? "linear-gradient(135deg, #0b1220 0%, #141a2b 100%)" : "linear-gradient(135deg, #f5f7fb 0%, #ffffff 100%)",
+      color: isDark ? "#e7ecf3" : "#0f172a",
       fontFamily:
         "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif",
       display: "flex",
@@ -23,8 +24,8 @@ function Resources() {
     card: {
       width: "100%",
       maxWidth: 720,
-      background: "rgba(255,255,255,0.06)",
-      border: "1px solid rgba(255,255,255,0.12)",
+      background: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.8)",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(2,6,23,0.08)"}`,
       borderRadius: 20,
       padding: 22,
       boxShadow: "0 16px 48px rgba(0,0,0,.45)",
@@ -47,15 +48,15 @@ function Resources() {
       fontWeight: 800,
       letterSpacing: 0.3,
     },
-    title: { fontSize: 24, fontWeight: 900, color: "#F6FAFF", margin: 0 },
+    title: { fontSize: 24, fontWeight: 900, color: isDark ? "#F6FAFF" : "#0f172a", margin: 0 },
     list: { margin: "10px 0 0 0", padding: 0, listStyle: "none" },
     item: {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
       gap: 12,
-      background: "rgba(255,255,255,0.08)",
-      border: "1px solid rgba(255,255,255,0.12)",
+      background: isDark ? "rgba(255,255,255,0.08)" : "rgba(2,6,23,0.03)",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(2,6,23,0.08)"}`,
       borderRadius: 14,
       padding: "14px 16px",
       marginTop: 10,
@@ -74,7 +75,7 @@ function Resources() {
       fontSize: 18,
     },
     name: {
-      color: "#F6FAFF",
+      color: isDark ? "#F6FAFF" : "#0f172a",
       fontWeight: 700,
       whiteSpace: "nowrap",
       overflow: "hidden",
@@ -84,9 +85,9 @@ function Resources() {
       textDecoration: "none",
       padding: "10px 14px",
       borderRadius: 12,
-      background: "rgba(96,165,250,.2)",
-      border: "1px solid rgba(96,165,250,.45)",
-      color: "#bfdbfe",
+      background: isDark ? "rgba(96,165,250,.2)" : "rgba(59,130,246,0.08)",
+      border: `1px solid ${isDark ? "rgba(96,165,250,.45)" : "rgba(59,130,246,0.22)"}`,
+      color: isDark ? "#bfdbfe" : "#1d4ed8",
       fontWeight: 800,
       whiteSpace: "nowrap",
     },
@@ -121,17 +122,20 @@ function Resources() {
             >
               <div style={ui.left}>
                 <div style={ui.icon}>{res.icon}</div>
-                <div style={ui.name}>{res.name}</div>
+                <div>
+                  <div style={ui.name}>{res.name}</div>
+                  <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>{res.detail}</div>
+                </div>
               </div>
               <a
                 href={res.link}
-                target="_blank"
+                target={res.link.startsWith("http") ? "_blank" : undefined}
                 rel="noopener noreferrer"
                 style={ui.linkBtn}
-                onMouseOver={(e) => (e.currentTarget.style.background = "rgba(96,165,250,.3)")}
-                onMouseOut={(e) => (e.currentTarget.style.background = "rgba(96,165,250,.2)")}
+                onMouseOver={(e) => (e.currentTarget.style.background = isDark ? "rgba(96,165,250,.3)" : "rgba(59,130,246,0.14)")}
+                onMouseOut={(e) => (e.currentTarget.style.background = isDark ? "rgba(96,165,250,.2)" : "rgba(59,130,246,0.08)")}
               >
-                Open
+                {res.link.startsWith("mailto:") ? "Email" : res.link.startsWith("tel:") ? "Call" : "Visit"}
               </a>
             </li>
           ))}

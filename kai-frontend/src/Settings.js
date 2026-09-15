@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 
-function Setting({ onBack }) {
-  const [darkMode, setDarkMode] = useState(true);
+function Setting({ onBack, theme = "dark", setTheme }) {
   const [compactChat, setCompactChat] = useState(false);
+  const isDark = theme === "dark";
 
   const ui = {
     page: {
       minHeight: "100vh",
-      background: "linear-gradient(135deg, #0b1220 0%, #141a2b 100%)",
-      color: "#e7ecf3",
+      background: isDark
+        ? "linear-gradient(135deg, #0b1220 0%, #141a2b 100%)"
+        : "linear-gradient(135deg, #f5f7fb 0%, #ffffff 100%)",
+      color: isDark ? "#e7ecf3" : "#0f172a",
       fontFamily:
         "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif",
       display: "flex",
@@ -37,21 +39,21 @@ function Setting({ onBack }) {
     back: {
       padding: "8px 12px",
       borderRadius: 12,
-      background: "rgba(255,255,255,0.10)",
-      border: "1px solid rgba(255,255,255,0.18)",
-      color: "#fff",
+      background: isDark ? "rgba(255,255,255,0.10)" : "rgba(2,6,23,0.04)",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.18)" : "rgba(2,6,23,0.08)"}`,
+      color: isDark ? "#fff" : "#0f172a",
       cursor: "pointer",
     },
     sub: { opacity: 0.9, marginBottom: 12 },
 
     section: {
       marginTop: 12,
-      background: "rgba(255,255,255,0.06)",
-      border: "1px solid rgba(255,255,255,0.12)",
+      background: isDark ? "rgba(255,255,255,0.06)" : "rgba(2,6,23,0.02)",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(2,6,23,0.08)"}`,
       borderRadius: 16,
       padding: 14,
     },
-    sectionTitle: { fontWeight: 800, color: "#F6FAFF", marginBottom: 8 },
+    sectionTitle: { fontWeight: 800, color: isDark ? "#F6FAFF" : "#0f172a", marginBottom: 8 },
 
     row: {
       display: "flex",
@@ -59,18 +61,18 @@ function Setting({ onBack }) {
       justifyContent: "space-between",
       gap: 10,
       padding: "10px 0",
-      borderBottom: "1px dashed rgba(255,255,255,0.12)",
+      borderBottom: `1px dashed ${isDark ? "rgba(255,255,255,0.12)" : "rgba(2,6,23,0.08)"}`,
     },
     lastRow: { borderBottom: "none" },
-    label: { fontWeight: 700, color: "#F6FAFF" },
+    label: { fontWeight: 700, color: isDark ? "#F6FAFF" : "#0f172a" },
     help: { fontSize: 13, opacity: 0.85 },
 
     toggle: (on) => ({
       width: 48,
       height: 28,
       borderRadius: 999,
-      background: on ? "#34d399" : "rgba(255,255,255,0.18)",
-      border: "1px solid rgba(255,255,255,0.2)",
+      background: on ? "#34d399" : isDark ? "rgba(255,255,255,0.18)" : "rgba(2,6,23,0.12)",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(2,6,23,0.08)"}`,
       position: "relative",
       cursor: "pointer",
       transition: "background .15s ease",
@@ -82,7 +84,7 @@ function Setting({ onBack }) {
       width: 22,
       height: 22,
       borderRadius: "50%",
-      background: "#0a1220",
+      background: isDark ? "#0a1220" : "#ffffff",
       transition: "left .15s ease",
       boxShadow: "0 4px 10px rgba(0,0,0,.3)",
     }),
@@ -139,12 +141,12 @@ function Setting({ onBack }) {
             </div>
             <div
               role="switch"
-              aria-checked={darkMode}
-              onClick={() => setDarkMode((v) => !v)}
-              style={ui.toggle(darkMode)}
+              aria-checked={isDark}
+              onClick={() => setTheme && setTheme((value) => (value === "dark" ? "light" : "dark"))}
+              style={ui.toggle(isDark)}
               title="Toggle dark mode"
             >
-              <div style={ui.knob(darkMode)} />
+              <div style={ui.knob(isDark)} />
             </div>
           </div>
 

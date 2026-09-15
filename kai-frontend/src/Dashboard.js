@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
   CartesianGrid,
   XAxis,
   YAxis,
@@ -266,8 +264,28 @@ function Dashboard({ onNavigate }) {
   const span = isWide ? { gridColumn: "span 6" } : { gridColumn: "span 12" };
 
   const runCheck = () => {
-    const r = analyzeMood(text);
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    const r = analyzeMood(trimmed);
     setResult(r);
+
+    const nextEntry = {
+      mood: r.mood || "neutral",
+      score: Number(r.score || 5),
+      note: trimmed,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMoodHistory((prev) => {
+      const updated = [...prev, nextEntry];
+      try {
+        localStorage.setItem("kai_mood_history", JSON.stringify(updated));
+      } catch (error) {
+        console.error("Failed to save mood history", error);
+      }
+      return updated;
+    });
   };
 
   return (

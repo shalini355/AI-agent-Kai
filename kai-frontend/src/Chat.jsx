@@ -340,8 +340,6 @@ function Chat({ onBack, onSentimentChange }) {
     `,
   };
 
-  const currentPalette = sentimentColors[currentMood] || sentimentColors.neutral;
-
   return (
     <div style={styles.page}>
       <style>{styles.styleTag}</style>
