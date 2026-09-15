@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            kai-backend/package-lock.json
+            kai-frontend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: kai-backend
+        run: npm ci
+
+      - name: Check backend
+        working-directory: kai-backend
+        run: npm run check
+
+      - name: Test backend
+        working-directory: kai-backend
+        run: npm test
+
+      - name: Install frontend dependencies
+        working-directory: kai-frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: kai-frontend
+        run: npm run build

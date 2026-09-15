@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { apiRequest } from "./services/api";
 
 const quickReplies = [
   "Thoda stressed hoon aaj...",
@@ -15,7 +16,7 @@ const sentimentColors = {
   neutral: { glow: "#a5b4fc", badge: "rgba(165,180,252,0.18)", border: "rgba(165,180,252,0.38)" },
 };
 
-function Chat({ onBack, onSentimentChange }) {
+function Chat({ onBack, onSentimentChange, token }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -37,7 +38,7 @@ function Chat({ onBack, onSentimentChange }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const persistMoodHistory = (sentiment) => {
+  const persistLocalMoodHistory = (sentiment) => {
     if (typeof window === "undefined") return;
 
     const entry = {
@@ -76,18 +77,16 @@ function Chat({ onBack, onSentimentChange }) {
     setTyping(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/chat", {
+      const data = await apiRequest("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
+        token,
       });
-
-      const data = await response.json();
       const sentiment = normalizeSentiment(data);
 
       setCurrentMood(sentiment.mood);
       onSentimentChange?.(sentiment);
-      persistMoodHistory(sentiment);
+      persistLocalMoodHistory(sentiment);
 
       setMessages((prev) => [
         ...prev,

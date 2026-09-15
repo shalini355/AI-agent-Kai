@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kai
+      POSTGRES_USER: kai
+      POSTGRES_PASSWORD: kai_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - kai-postgres:/var/lib/postgresql/data
+      - ./kai-backend/db/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kai -d kai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      args:
+        REACT_APP_API_URL: /api
+        REACT_APP_AUTH_REQUIRED: "true"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://kai:kai_password@postgres:5432/kai
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: http://localhost:5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  kai-postgres:

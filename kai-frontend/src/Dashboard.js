@@ -9,8 +9,18 @@ import {
   AreaChart,
 } from "recharts";
 import { analyzeMood } from "./moodUtils";
+import { apiRequest } from "./services/api";
 
-function Dashboard({ onNavigate }) {
+const normalizeHistory = (entries) =>
+  [...entries]
+    .map((entry) => ({
+      ...entry,
+      score: Number(entry.score || 5),
+      timestamp: entry.timestamp || entry.created_at || new Date().toISOString(),
+    }))
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+function Dashboard({ onNavigate, token }) {
   const [showChecker, setShowChecker] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [text, setText] = useState("");
@@ -20,11 +30,19 @@ function Dashboard({ onNavigate }) {
   useEffect(() => {
     try {
       const stored = JSON.parse(localStorage.getItem("kai_mood_history") || "[]");
-      setMoodHistory(stored);
+      setMoodHistory(normalizeHistory(stored));
     } catch (error) {
       console.error("Failed to load mood history", error);
     }
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    apiRequest("/api/moods", { token })
+      .then((data) => setMoodHistory(normalizeHistory(data.entries || [])))
+      .catch((error) => console.error("Failed to load server mood history", error));
+  }, [token]);
 
   const chartData = useMemo(() => {
     return moodHistory.map((entry, index) => ({
@@ -278,11 +296,18 @@ function Dashboard({ onNavigate }) {
     };
 
     setMoodHistory((prev) => {
-      const updated = [...prev, nextEntry];
+      const updated = normalizeHistory([...prev, nextEntry]);
       try {
         localStorage.setItem("kai_mood_history", JSON.stringify(updated));
       } catch (error) {
         console.error("Failed to save mood history", error);
+      }
+      if (token) {
+        apiRequest("/api/moods", {
+          method: "POST",
+          body: JSON.stringify({ ...nextEntry, source: "check-in" }),
+          token,
+        }).catch((error) => console.error("Failed to persist mood check-in", error));
       }
       return updated;
     });

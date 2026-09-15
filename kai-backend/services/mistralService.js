@@ -1,9 +1,7 @@
 import { Mistral } from "@mistralai/mistralai";
-import dotenv from "dotenv";
+import env from "../config/env.js";
 
-dotenv.config();
-
-const apiKey = process.env.MISTRAL_API_KEY;
+const apiKey = env.MISTRAL_API_KEY;
 
 if (!apiKey) {
   console.warn("⚠️ MISTRAL_API_KEY is missing from environment variables.");
@@ -75,22 +73,24 @@ export async function getKaiReply(message) {
     };
   }
 
-  const systemPrompt = `You are Kai, an empathetic, culturally aware wellness companion for the "Kai — Empathetic AI Wellness Agent" project. Respond naturally and warmly in English or Hinglish, switching fluidly based on the user's tone and language. Be supportive, non-judgmental, practical, and concise. Encourage healthy self-reflection, gently validate feelings, and provide useful next steps when appropriate. Always append a JSON sentiment metadata block at the end of every response in this exact format: [[SENTIMENT:{"mood":"happy|calm|anxious|sad|neutral","score":1-10}]]. Keep the main response user-friendly and conversational.\n\nUser message: ${message}`;
+  const systemPrompt = `You are Kai, an empathetic, culturally aware wellness companion for the "Kai — Empathetic AI Wellness Agent" project. Respond naturally and warmly in English or Hinglish, switching fluidly based on the user's tone and language. Be supportive, non-judgmental, practical, and concise. Encourage healthy self-reflection, gently validate feelings, and provide useful next steps when appropriate. Never diagnose, provide medical instructions, or present yourself as a replacement for professional care. Always append a JSON sentiment metadata block at the end of every response in this exact format: [[SENTIMENT:{"mood":"happy|calm|anxious|sad|neutral","score":1-10}]]. Keep the main response user-friendly and conversational.`;
 
   try {
-    const response = await client.chat.complete({
+    const completion = client.chat.complete({
       model: "mistral-small-latest",
       messages: [
         {
           role: "system",
           content: systemPrompt,
         },
-        {
-          role: "user",
-          content: message,
-        },
+        { role: "user", content: message },
       ],
     });
+
+    const response = await Promise.race([
+      completion,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("AI provider timeout")), env.AI_TIMEOUT_MS)),
+    ]);
 
     let rawReply = response.choices?.[0]?.message?.content ?? "";
     let sentiment = { mood: "neutral", score: 5 };

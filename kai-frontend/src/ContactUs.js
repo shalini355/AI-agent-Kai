@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { apiRequest } from "./services/api";
 
-function ContactUs({ onBack, onSubmitSuccess, theme = "dark" }) {
+function ContactUs({ onBack, onSubmitSuccess, theme = "dark", token }) {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
   const isDark = theme === "dark";
 
   const page = {
@@ -79,8 +81,19 @@ function ContactUs({ onBack, onSubmitSuccess, theme = "dark" }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Fake async submit; replace with real API/email service
-    await new Promise((r) => setTimeout(r, 900));
+    setError("");
+    try {
+      await apiRequest("/api/support", {
+        method: "POST",
+        body: JSON.stringify(form),
+        token,
+      });
+    } catch (error) {
+      setLoading(false);
+      setSent(false);
+      setError(error.message || "We could not send your request. Please try again.");
+      return;
+    }
     setLoading(false);
     setSent(true);
     onSubmitSuccess && onSubmitSuccess(form);
@@ -146,6 +159,7 @@ function ContactUs({ onBack, onSubmitSuccess, theme = "dark" }) {
             </div>
 
             {sent && <div style={success}>Thanks! Your message has been sent.</div>}
+            {error && <div role="alert" style={{ ...success, background: "rgba(239,68,68,0.14)", borderColor: "rgba(239,68,68,0.35)", color: isDark ? "#fecaca" : "#b91c1c" }}>{error}</div>}
           </form>
 
           <div style={{ marginTop: 20, opacity: 0.9 }}>

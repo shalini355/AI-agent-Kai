@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { apiRequest } from "./services/api";
 
-function Setting({ onBack, theme = "dark", setTheme }) {
+function Setting({ onBack, theme = "dark", setTheme, token, onSignOut }) {
   const [compactChat, setCompactChat] = useState(false);
   const isDark = theme === "dark";
+  const [status, setStatus] = useState("");
 
   const ui = {
     page: {
@@ -178,7 +180,17 @@ function Setting({ onBack, theme = "dark", setTheme }) {
             </div>
             <button
               style={ui.back}
-              onClick={() => alert("Export started…")}
+              onClick={() => {
+                const moodHistory = localStorage.getItem("kai_mood_history") || "[]";
+                const blob = new Blob([moodHistory], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "kai-mood-history.json";
+                link.click();
+                URL.revokeObjectURL(url);
+                setStatus("Your local mood history was exported.");
+              }}
             >
               Export
             </button>
@@ -191,7 +203,18 @@ function Setting({ onBack, theme = "dark", setTheme }) {
             </div>
             <button
               style={ui.back}
-              onClick={() => alert("Deletion request submitted.")}
+              onClick={async () => {
+                localStorage.removeItem("kai_mood_history");
+                if (token) {
+                  try {
+                    await apiRequest("/api/moods", { method: "DELETE", token });
+                  } catch (error) {
+                    setStatus(error.message || "Stored server data could not be deleted.");
+                    return;
+                  }
+                }
+                setStatus("Your stored mood data was deleted.");
+              }}
             >
               Request
             </button>
@@ -205,11 +228,15 @@ function Setting({ onBack, theme = "dark", setTheme }) {
           </div>
           <button
             style={ui.dangerBtn}
-            onClick={() => alert("Signed out locally.")}
+            onClick={() => {
+              sessionStorage.removeItem("kai_access_token");
+              onSignOut ? onSignOut() : onBack();
+            }}
           >
             Sign Out
           </button>
         </div>
+        {status && <div role="status" style={{ marginTop: 12, color: isDark ? "#b6ffde" : "#166534" }}>{status}</div>}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import Settings from "./Settings";
 import Chat from "./Chat";
 import ContactUs from "./ContactUs";
 import AboutPage from "./AboutPage";
+import AuthScreen from "./AuthScreen";
 
 const sentimentPalettes = {
   happy: {
@@ -45,6 +46,8 @@ const sentimentPalettes = {
 function App() {
   const [page, setPage] = useState("welcome");
   const [consent, setConsent] = useState(false);
+  const authRequired = process.env.REACT_APP_AUTH_REQUIRED === "true";
+  const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("kai_access_token"));
   const [theme, setTheme] = useState(() => {
     try {
       return localStorage.getItem("kai_theme") || "dark";
@@ -193,17 +196,17 @@ function App() {
 
     switch (page) {
       case "dashboard":
-        return <Dashboard onNavigate={setPage} theme={theme} />;
+        return <Dashboard onNavigate={setPage} theme={theme} token={authToken} />;
       case "wellness":
         return <WellnessActivities setScreen={setPage} theme={theme} />;
       case "resources":
         return <Resources theme={theme} onBack={() => setPage("dashboard")} />;
       case "settings":
-        return <Settings onBack={() => setPage("dashboard")} theme={theme} setTheme={setTheme} />;
+        return <Settings onBack={() => setPage("dashboard")} onSignOut={() => { setAuthToken(null); setConsent(false); setPage("welcome"); }} theme={theme} setTheme={setTheme} token={authToken} />;
       case "chat":
-        return <Chat onBack={() => setPage("dashboard")} onSentimentChange={handleSentimentChange} theme={theme} />;
+        return <Chat onBack={() => setPage("dashboard")} onSentimentChange={handleSentimentChange} theme={theme} token={authToken} />;
       case "contact":
-        return <ContactUs onBack={() => setPage("welcome")} theme={theme} />;
+        return <ContactUs onBack={() => setPage("welcome")} theme={theme} token={authToken} />;
       case "about":
         return <AboutPage onBack={() => setPage("welcome")} theme={theme} />;
       default:
@@ -212,6 +215,12 @@ function App() {
   };
 
   return (
+    authRequired && !authToken ? (
+      <AuthScreen
+        theme={theme}
+        onAuthenticated={() => setAuthToken(sessionStorage.getItem("kai_access_token"))}
+      />
+    ) : (
     <div style={styles.app}>
       <div style={styles.glow} />
       <div style={styles.nav}>
@@ -237,6 +246,8 @@ function App() {
           <span
             style={{ ...styles.link, background: theme === "dark" ? "rgba(239,68,68,0.15)" : "rgba(239,68,68,0.2)" }}
             onClick={() => {
+              sessionStorage.removeItem("kai_access_token");
+              setAuthToken(null);
               setConsent(false);
               setPage("welcome");
             }}
@@ -251,6 +262,7 @@ function App() {
       </div>
       <div style={styles.content}>{renderPage()}</div>
     </div>
+    )
   );
 }
 

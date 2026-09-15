@@ -10,19 +10,19 @@ Kai is a full-stack wellness companion that combines empathetic AI chat, mood ch
 ![Express](https://img.shields.io/badge/Express.js-000000?style=flat&logo=express&logoColor=white)
 ![Mistral](https://img.shields.io/badge/Mistral-AI-FF6B6B?style=flat)
 
-## What the app includes
+## Product capabilities
 
-- Welcome experience with light/dark theme switching and persistent theme preference
+- Welcome experience with persistent light/dark theme switching
 - Consent gate with in-app Privacy Policy and Terms of Use content
+- JWT account registration and login for production deployments
 - Empathetic KAI chat powered by Mistral, with English and Hinglish support
-- Mood sentiment metadata and score updates from chat responses
-- Dashboard mood checker with saved notes, latest mood, average score, and history chart
+- Mood sentiment metadata, scores, notes, history charts, and server persistence
 - Wellness activities for journaling, breathing, affirmations, stretching, meditation, and gratitude
 - Resource Navigator with direct email, phone, SMS, and external guide actions
-- Settings for theme, compact chat preference, local data export/deletion actions, and sign-out UI
-- Contact Us form with support contact details
-- About page and consistent back navigation across secondary screens
-- Express health checks, structured routes/controllers/services, and an AI fallback response when Mistral is unavailable
+- Settings for theme, local export, server-side mood deletion, and sign-out
+- Validated support request submission backed by PostgreSQL
+- Error boundary, API retries, loading/error feedback, health checks, structured logs, rate limiting, security headers, and strict CORS
+- Docker Compose local stack and GitHub Actions CI validation
 
 ## Technology
 
@@ -30,59 +30,66 @@ Kai is a full-stack wellness companion that combines empathetic AI chat, mood ch
 | --- | --- |
 | Frontend | React 19, Create React App, inline component styles |
 | Charts | Recharts |
-| HTTP | Browser Fetch API, REST JSON |
-| Backend | Node.js, Express 5, CORS, dotenv |
+| HTTP | Fetch API, REST JSON, bounded retry client |
+| Backend | Node.js, Express 5, Helmet, CORS, Pino |
 | AI provider | Mistral AI SDK using `mistral-small-latest` |
-| Persistence | Browser `localStorage`; no database is currently required |
+| Auth | JWT access tokens and bcrypt password hashing |
+| Database | PostgreSQL via `pg` |
+| Validation | Zod request and environment schemas |
 
 ## Repository layout
 
 ```text
 AI-agent-Kai/
 ├── README.md
+├── Dockerfile
+├── docker-compose.yml
+├── .github/workflows/ci.yml
 ├── kai-backend/
-│   ├── server.js                 # Express server and static build hosting
-│   ├── package.json
+│   ├── server.js
+│   ├── .env.example
+│   ├── config/env.js
+│   ├── db/schema.sql
+│   ├── db/pool.js
+│   ├── middleware/
+│   ├── validators/
 │   ├── controllers/
-│   │   └── chatController.js     # Request validation and response handling
 │   ├── routes/
-│   │   └── chatRoutes.js         # Chat and route-level health endpoint
 │   └── services/
-│       └── mistralService.js     # Mistral integration and fallback replies
 └── kai-frontend/
-		├── package.json
-		├── public/
-		└── src/
-				├── App.js                # App shell, navigation, theme, consent state
-				├── Chat.jsx              # AI conversation UI and sentiment persistence
-				├── Dashboard.js          # Mood overview, checker, and chart
-				├── ConsentModal.js       # Privacy and terms flow
-				├── WellnessActivities.js # Interactive activity toolkit
-				├── Resources.js          # Support and crisis resource actions
-				├── Settings.js
-				├── ContactUs.js
-				├── AboutPage.js
-				└── moodUtils.js          # Local mood keyword analysis
+    ├── .env.example
+    ├── public/
+    └── src/
+        ├── App.js
+        ├── AuthScreen.jsx
+        ├── ErrorBoundary.jsx
+        ├── Chat.jsx
+        ├── Dashboard.js
+        ├── ConsentModal.js
+        ├── WellnessActivities.js
+        ├── Resources.js
+        ├── Settings.js
+        ├── ContactUs.js
+        ├── services/api.js
+        └── moodUtils.js
 ```
 
 ## Requirements
 
 - Node.js 18 or newer
 - npm
+- PostgreSQL 14+ or Docker Desktop
 - A Mistral API key for live AI responses
+- A random JWT secret of at least 32 characters
 
 ## Local setup
 
-### 1. Clone the repository
+### Install dependencies
 
 ```bash
 git clone https://github.com/shalini355/AI-agent-Kai.git
 cd AI-agent-Kai
-```
 
-### 2. Install dependencies
-
-```bash
 cd kai-backend
 npm install
 
@@ -90,44 +97,67 @@ cd ../kai-frontend
 npm install
 ```
 
-### 3. Configure the backend
+### Configure the backend
 
 Create `kai-backend/.env`:
 
 ```env
-MISTRAL_API_KEY=your_mistral_api_key_here
+NODE_ENV=development
 PORT=5000
+MISTRAL_API_KEY=your_backend_only_mistral_key
+DATABASE_URL=postgresql://kai:kai_password@localhost:5432/kai
+JWT_SECRET=replace_with_at_least_32_random_characters
+CORS_ORIGIN=http://localhost:3000
+API_RATE_LIMIT=60
+AI_TIMEOUT_MS=20000
 ```
 
-Never commit `.env` or expose the Mistral key in frontend code. The backend logs a warning and returns a clear unavailable response when the key is missing.
+The complete template is in `kai-backend/.env.example`. Never commit `.env` or expose Mistral credentials in frontend variables. Rotate any credential that has ever been committed or placed in a frontend environment file.
 
-### 4. Start development servers
+### Configure the frontend
+
+Create `kai-frontend/.env`:
+
+```env
+REACT_APP_API_URL=http://localhost:5000
+REACT_APP_AUTH_REQUIRED=false
+```
+
+Set `REACT_APP_AUTH_REQUIRED=true` for production builds.
+
+### Start the development servers
 
 Use two terminals:
-
-Terminal 1:
 
 ```bash
 cd kai-backend
 npm start
 ```
 
-Terminal 2:
-
 ```bash
 cd kai-frontend
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The frontend sends chat requests to `http://localhost:5000/api/chat`.
+Open [http://localhost:3000](http://localhost:3000). The backend health endpoint is [http://localhost:5000/api/health](http://localhost:5000/api/health).
 
-## Available commands
+### Start the complete local stack with Docker
+
+```bash
+MISTRAL_API_KEY=your_key JWT_SECRET=your_32_character_secret docker compose up --build
+```
+
+This starts PostgreSQL, applies `kai-backend/db/schema.sql`, builds the React app, and serves the combined application at [http://localhost:5000](http://localhost:5000).
+
+## Commands
 
 ### Backend
 
 ```bash
-npm start       # Start the Express server
-npm run dev     # Start with Node's watch mode
+npm start       # Start Express
+npm run dev     # Start with Node watch mode
+npm run check   # Syntax-check backend modules
+npm test        # Run backend validation contract tests
 ```
 
 ### Frontend
@@ -135,104 +165,110 @@ npm run dev     # Start with Node's watch mode
 ```bash
 npm start       # Start the development server
 npm run build   # Create a production build
+npm run check   # Run the production build as a validation check
 npm test        # Run the Create React App test runner
 ```
 
-The current frontend build has been verified with `npm run build`.
-
 ## API reference
 
-### `GET /api/health`
+All protected requests use `Authorization: Bearer <token>`.
 
-Returns backend status:
+### Health
 
-```json
-{
-	"ok": true,
-	"service": "kai-backend"
-}
-```
+- `GET /api/health`: liveness status
+- `GET /api/readiness`: Mistral and database readiness status
+- `GET /api/chat/health`: chat router health status
 
-### `GET /api/chat/health`
+### Authentication
 
-Returns the same health response from the chat router.
-
-### `POST /api/chat`
-
-Request:
+`POST /api/auth/register` and `POST /api/auth/login` accept:
 
 ```json
 {
-	"message": "I feel anxious about tomorrow"
+  "email": "person@example.com",
+  "password": "a-password-at-least-12-characters"
 }
 ```
 
-Successful response shape:
+Both return a short-lived JWT and safe user profile. `GET /api/auth/me` returns the current authenticated profile.
+
+### Chat
+
+`POST /api/chat` accepts:
 
 ```json
 {
-	"reply": "...",
-	"mood": "anxious",
-	"sentiment": {
-		"mood": "anxious",
-		"score": 4
-	}
+  "message": "I feel anxious about tomorrow"
 }
 ```
 
-An empty message returns HTTP `400`. Provider or server failures return a neutral fallback response rather than exposing provider errors to the user.
+Response:
 
-### `POST /ai-mood`
+```json
+{
+  "reply": "...",
+  "mood": "anxious",
+  "sentiment": {
+    "mood": "anxious",
+    "score": 4
+  }
+}
+```
 
-Legacy-compatible alias for the same chat controller and request/response contract as `POST /api/chat`.
+In production, chat requires authentication. Messages are limited to 4000 characters, requests are rate-limited, and provider calls have a timeout. Provider failures degrade to a safe response without exposing internal errors.
 
-## Client-side data
+### Mood data
 
-Kai currently uses browser storage instead of a database:
+- `GET /api/moods`: latest 100 entries for the authenticated user
+- `POST /api/moods`: create a `{ mood, score, note, source }` entry
+- `DELETE /api/moods`: delete the authenticated user's mood history
+
+`score` must be an integer from 1 to 10. `source` is `check-in` or `chat`.
+
+### Support
+
+`POST /api/support` accepts validated `name`, `email`, and `message` fields and stores a support request in PostgreSQL. It can be submitted anonymously or with an authenticated token.
+
+## Data and privacy
+
+PostgreSQL stores users, mood entries, conversations/messages, and support requests. The browser keeps a small local recovery/cache layer:
 
 | Key | Contents |
 | --- | --- |
-| `kai_theme` | `dark` or `light` theme preference |
-| `kai_mood_history` | JSON array of mood scores, timestamps, and check-in notes |
+| `kai_theme` | `dark` or `light` preference |
+| `kai_mood_history` | Local recovery copy of mood entries |
+| `kai_access_token` | Session-scoped JWT when auth is enabled |
 
-Data is local to the browser profile. Clearing site data removes these values. The app does not currently provide server-side accounts, synchronization, or database-backed storage.
+Use the Settings deletion action to remove server-side mood history. A production deployment still needs managed secrets, encrypted database connections, backups, retention controls, audit logging, and a privacy/legal review.
 
 ## Production deployment
 
-Build the frontend first:
+The root `Dockerfile` builds the frontend and serves it from the backend image. `docker-compose.yml` provides a local PostgreSQL-backed deployment:
 
 ```bash
-cd kai-frontend
-npm run build
+MISTRAL_API_KEY=your_key JWT_SECRET=your_32_character_secret docker compose up --build -d
 ```
 
-The Express server serves static frontend files when `kai-backend/build/index.html` exists. To deploy the combined app, copy the generated frontend `build` directory into `kai-backend/build`, configure the backend environment, and start the backend:
+For a managed platform, provide `DATABASE_URL`, `MISTRAL_API_KEY`, `JWT_SECRET`, `CORS_ORIGIN`, and the rate/timeout settings through the platform secret manager. Do not put backend secrets in `REACT_APP_*` variables.
 
-```bash
-cd kai-frontend
-npm run build
+The backend serves the React build when `kai-backend/build/index.html` exists. API routes remain under `/api/*`; non-API routes fall back to React `index.html`.
 
-# Copy kai-frontend/build to kai-backend/build using your platform's file-copy command.
+## Security and safety
 
-cd ../kai-backend
-npm start
-```
-
-The combined application is then available from the backend port, normally [http://localhost:5000](http://localhost:5000). API routes remain under `/api/*`; non-API routes fall back to the React `index.html`.
-
-## Privacy and safety notes
-
-- Consent is required before entering the dashboard.
-- The Privacy Policy and Terms of Use are displayed inside the consent flow.
-- Chat and mood history are intended for personal wellness reflection and are stored locally by the current implementation.
-- Do not share passwords, API keys, financial details, or other unnecessary sensitive information in chat.
+- Environment variables are validated at startup.
+- CORS is allowlisted instead of open to every origin.
+- Helmet, JSON body limits, rate limiting, and Zod validation protect the API boundary.
+- Passwords are bcrypt-hashed and JWTs are short-lived.
+- Do not share passwords, API keys, financial details, or unnecessary sensitive information in chat.
 - KAI must not be relied on for diagnosis, treatment decisions, or crisis response.
 
-## Contributing
+## CI and contribution
+
+GitHub Actions in `.github/workflows/ci.yml` installs both packages, syntax-checks the backend, and builds the frontend on pushes and pull requests to `main`.
 
 1. Create a focused branch from `main`.
-2. Keep frontend and backend changes scoped to the relevant package.
-3. Run `npm run build` in `kai-frontend` before opening a pull request.
+2. Keep changes scoped to the relevant package and update the API/README when contracts change.
+3. Run `npm run check` in both packages before opening a pull request.
 4. Do not commit `.env`, API keys, `node_modules`, or generated build output.
 
 ## Maintainer
