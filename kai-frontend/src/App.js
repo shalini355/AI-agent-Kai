@@ -197,7 +197,7 @@ function App() {
       case "wellness":
         return <WellnessActivities setScreen={setPage} theme={theme} />;
       case "resources":
-        return <Resources theme={theme} />;
+        return <Resources theme={theme} onBack={() => setPage("dashboard")} />;
       case "settings":
         return <Settings onBack={() => setPage("dashboard")} theme={theme} setTheme={setTheme} />;
       case "chat":

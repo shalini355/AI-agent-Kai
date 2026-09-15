@@ -1,6 +1,6 @@
 import React from "react";
 
-function Resources({ theme = "dark" }) {
+function Resources({ theme = "dark", onBack }) {
   const isDark = theme === "dark";
   const resources = [
     { name: "KAI Support Team", detail: "hello@kaiwellness.app", link: "mailto:hello@kaiwellness.app", icon: "✉️" },
@@ -36,6 +36,15 @@ function Resources({ theme = "dark" }) {
       alignItems: "center",
       justifyContent: "space-between",
       marginBottom: 10,
+    },
+    back: {
+      padding: "8px 12px",
+      borderRadius: 10,
+      background: isDark ? "rgba(255,255,255,0.08)" : "rgba(2,6,23,0.04)",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(2,6,23,0.08)"}`,
+      color: isDark ? "#fff" : "#0f172a",
+      cursor: "pointer",
+      fontWeight: 700,
     },
     titleWrap: { display: "flex", alignItems: "center", gap: 10 },
     badge: {
@@ -110,6 +119,7 @@ function Resources({ theme = "dark" }) {
             <h2 style={ui.title}>Resource Navigator</h2>
             <span style={ui.badge}>Helpful links</span>
           </div>
+          <button style={ui.back} onClick={onBack}>← Back</button>
         </div>
 
         <ul style={ui.list}>
